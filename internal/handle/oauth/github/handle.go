@@ -130,6 +130,6 @@ func HandleCallBack(c *gin.Context) {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
 	}
-	middleware.Success(c, user.LoginResponse{Token: serviceToken})
+	c.Redirect(302, config.GetConfig().FrontendLogin+"/#/auth?token="+serviceToken)
 	users.SetLoginLog(entity.ID, token)
 }
