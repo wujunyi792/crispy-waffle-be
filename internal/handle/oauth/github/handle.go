@@ -110,10 +110,18 @@ func HandleCallBack(c *gin.Context) {
 			{
 				OauthType:  "github",
 				OauthId:    strconv.Itoa(int(githubInfo.Id)),
-				UnionId:    "",
+				UnionId:    githubInfo.NodeId,
 				Credential: token,
 			},
 		},
+	}
+
+	err = users.RegisterUser(&newUser)
+
+	if err != nil {
+		logger.Error.Println(err)
+		middleware.FailWithCode(c, 40210, "自动创建用户失败")
+		return
 	}
 
 	middleware.Success(c, "用户不存在")
