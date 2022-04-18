@@ -1,11 +1,12 @@
 package config
 
 type GlobalConfig struct {
-	MODE        string
-	ProgramName string
-	AUTHOR      string
-	VERSION     string
-	Auth        struct {
+	MODE          string
+	ProgramName   string
+	AUTHOR        string
+	VERSION       string
+	FrontendLogin string
+	Auth          struct {
 		Secret string
 		Issuer string
 	}
@@ -59,6 +60,14 @@ type GlobalConfig struct {
 			AppId      string
 			TemplateId string
 			Sign       string
+		}
+	}
+	OAUTH struct {
+		GITHUB struct {
+			ClientId     string
+			ClientSecret string
+			RedirectUri  string
+			Scope        string
 		}
 	}
 }

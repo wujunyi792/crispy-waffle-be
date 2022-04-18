@@ -7,6 +7,7 @@ import (
 	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/baseServiceRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/fileRouter"
+	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/oauthRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/userRouter"
 	"github.com/wujunyi792/crispy-waffle-be/internal/router/v1/websocketRouter"
 )
@@ -34,4 +35,5 @@ func MainRouter(e *gin.Engine) {
 	fileRouter.InitFileRouter(e)
 	websocketRouter.InitWebSocketRouter(e)
 	userRouter.InitUserRouter(e)
+	oauthRouter.InitOauthRouter(e)
 }

@@ -29,8 +29,12 @@ var (
 		Err:  errors.New("登录过期"),
 	}
 	VerifyErr = ServiceError{
-		Code: 40103,
+		Code: 40104,
 		Err:  errors.New("访问受限"),
+	}
+	OauthErr = ServiceError{
+		Code: 40105,
+		Err:  errors.New("state 错误"),
 	}
 	InternalErr = ServiceError{
 		Code: 50000,
