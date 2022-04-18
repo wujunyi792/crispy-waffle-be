@@ -8,7 +8,7 @@ import (
 )
 
 type Info struct {
-	ID string
+	UID string
 }
 
 type JWTClaims struct {

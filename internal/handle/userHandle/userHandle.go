@@ -125,7 +125,7 @@ func HandleGeneralLogin(c *gin.Context) {
 		middleware.Fail(c, serviceErr.LoginErr)
 		return
 	}
-	token, err := jwtTokenGen.GenToken(jwtTokenGen.Info{ID: entity.ID})
+	token, err := jwtTokenGen.GenToken(jwtTokenGen.Info{UID: entity.ID})
 	if err != nil {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return

@@ -66,6 +66,14 @@ func CheckUserNameExist(username string) bool {
 	return res
 }
 
+func GetEntityByGithubId(githubID int64) (exist bool, entity *Mysql.User) {
+	entity = &Mysql.User{}
+	GetManage().atomicDBOperation(func() {
+		exist = GetManage().getGOrmDB().Model(entity).Where("github_id = ?", githubID).Find(entity).RowsAffected > 0
+	})
+	return
+}
+
 func GetEntity(entity *Mysql.User) *Mysql.User {
 	GetManage().atomicDBOperation(func() {
 		GetManage().getGOrmDB().Where(entity).Find(entity)

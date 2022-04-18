@@ -13,14 +13,17 @@ type User struct {
 	Password       string    `json:"-"`
 	Salt           string    `json:"-"`
 
-	RealName  string `json:"realName"`
-	NickName  string `json:"nickName" gorm:"unique"`
-	Sex       int    `json:"sex"`
-	Phone     string `json:"phone" gorm:"unique"`
-	Email     string `json:"email"`
-	Signature string `json:"signature"`
-	Status    string `json:"status"`
-	Avatar    string `json:"avatar"`
+	RealName    string `json:"realName"`
+	NickName    string `json:"nickName" gorm:"unique"`
+	Sex         int    `json:"sex"`
+	Phone       string `json:"phone" gorm:"unique"`
+	Email       string `json:"email"`
+	Signature   string `json:"signature"`
+	Status      string `json:"status"`
+	Avatar      string `json:"avatar"`
+	GithubID    int64  `json:"githubID" gorm:"unique"`
+	GitHubToken string `json:"-"`
+	GithubInfo  string `json:"-"`
 
 	Permission []*Permission `gorm:"many2many:users_permission;" json:"-"`
 }

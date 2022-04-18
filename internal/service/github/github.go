@@ -1,6 +1,8 @@
 package github
 
 import (
+	"errors"
+	"fmt"
 	"github.com/parnurzeal/gorequest"
 	"github.com/wujunyi792/crispy-waffle-be/config"
 	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
@@ -17,7 +19,7 @@ type Code2TokenResponse struct {
 
 type GithubUserInfo struct {
 	Login                   string      `json:"login"`
-	Id                      int         `json:"id"`
+	Id                      int64       `json:"id"`
 	NodeId                  string      `json:"node_id"`
 	AvatarUrl               string      `json:"avatar_url"`
 	GravatarId              string      `json:"gravatar_id"`
@@ -62,7 +64,7 @@ type GithubUserInfo struct {
 	} `json:"plan"`
 }
 
-func Code2Token(code, state string) (token string) {
+func Code2Token(code string) (token string) {
 	query := make(url.Values)
 	query.Add("client_id", config.GetConfig().OAUTH.GITHUB.ClientId)
 	query.Add("client_secret", config.GetConfig().OAUTH.GITHUB.ClientSecret)
@@ -82,4 +84,22 @@ func Code2Token(code, state string) (token string) {
 		return ""
 	}
 	return res.AccessToken
+}
+
+func GetGithubUserInfo(token string) (GithubUserInfo, error) {
+	reqUrl := url.URL{
+		Scheme: "https",
+		Host:   "api.github.com",
+		Path:   "/user",
+	}
+	res := GithubUserInfo{}
+	resp, _, err := gorequest.New().Get(reqUrl.String()).
+		Retry(3, time.Second, http.StatusBadRequest, http.StatusInternalServerError).
+		AppendHeader("Authorization", "token "+token).EndStruct(&res)
+	if err != nil {
+		logger.Error.Println(resp)
+		return res, errors.New(fmt.Sprintf("%v", err))
+	} else {
+		return res, nil
+	}
 }
