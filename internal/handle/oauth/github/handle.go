@@ -115,6 +115,7 @@ func HandleCallBack(c *gin.Context) {
 			},
 		},
 	}
+	logger.Debug.Println("新建用户", entity)
 
 	err = users.RegisterUser(&newUser)
 
