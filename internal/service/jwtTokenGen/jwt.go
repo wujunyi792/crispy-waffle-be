@@ -8,7 +8,8 @@ import (
 )
 
 type Info struct {
-	UID string
+	UID          string
+	InfoComplete bool
 }
 
 type JWTClaims struct {

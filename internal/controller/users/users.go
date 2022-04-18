@@ -35,7 +35,7 @@ func (m *UserDBManage) atomicDBOperation(op func()) {
 func GetManage() *UserDBManage {
 	if dbManage == nil {
 		var userDb = db.MustCreateGorm()
-		err := userDb.GetDB().AutoMigrate(&Mysql.Permission{}, &Mysql.User{})
+		err := userDb.GetDB().AutoMigrate(&Mysql.Permission{}, &Mysql.User{}, &Mysql.Oauth{})
 		if err != nil {
 			logger.Error.Fatalln(err)
 			return nil
@@ -69,7 +69,7 @@ func CheckUserNameExist(username string) bool {
 func GetEntityByGithubId(githubID int64) (exist bool, entity *Mysql.User) {
 	entity = &Mysql.User{}
 	GetManage().atomicDBOperation(func() {
-		exist = GetManage().getGOrmDB().Model(entity).Where("github_id = ?", githubID).Find(entity).RowsAffected > 0
+		exist = GetManage().getGOrmDB().Model(entity).Where("id = (SELECT user_id from `oauths` WHERE `oauths`.'oauth_id' = ?)", githubID).Find(entity).RowsAffected > 0
 	})
 	return
 }

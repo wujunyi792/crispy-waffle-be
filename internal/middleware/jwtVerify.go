@@ -12,7 +12,7 @@ func JwtVerify(c *gin.Context) {
 		entry, err := jwtTokenGen.ParseToken(token)
 		if err == nil {
 			//c.Set("token", token)
-			c.Set("uid", entry.Info.ID)
+			c.Set("uid", entry.Info.UID)
 			c.Next()
 			return
 		} else {
