@@ -81,6 +81,15 @@ func GetEntity(entity *Mysql.User) *Mysql.User {
 	return entity
 }
 
+func GetUserAllAuthApp(uid string) (res []Mysql.Oauth) {
+	GetManage().getGOrmDB().Model(&Mysql.Oauth{}).Where("user_id = ?", uid).Find(&res)
+	return
+}
+
+func AddGithubOauth(entity *Mysql.Oauth) error {
+	return GetManage().getGOrmDB().Create(entity).Error
+}
+
 func GetUserByID(id string) (entity *Mysql.User) {
 	entity = &Mysql.User{}
 	GetManage().atomicDBOperation(func() {

@@ -41,6 +41,11 @@ type UpdateNickNameRequest struct {
 	NickName string `json:"nickName" binding:"required"`
 }
 
+type UpdatePhoneRequest struct {
+	Phone string `json:"phone" binding:"required"`
+	Code  string `json:"code" binding:"required"`
+}
+
 type UpdateAvatarRequest struct {
 	AvatarUrl string `json:"avatarUrl" binding:"required"`
 }

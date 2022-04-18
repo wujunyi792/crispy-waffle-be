@@ -35,6 +35,21 @@ func makeNewSession(redirect string) string {
 	return sid
 }
 
+func makeNewBindSession(redirect string, uid string) string {
+	sid := uuid.NewV4().String()
+	err := redis.GetRedis().Set(sid, uid, time.Minute*10)
+	if err != nil {
+		logger.Error.Println(err)
+		return ""
+	}
+	err = redis.GetRedis().Set(sid+"_redirect", redirect, time.Minute*10)
+	if err != nil {
+		logger.Error.Println(err)
+		return ""
+	}
+	return sid
+}
+
 func HandleLogin(c *gin.Context) {
 	redirect := c.Query("redirect")
 	if redirect == "" {
@@ -64,7 +79,7 @@ func HandleCallBack(c *gin.Context) {
 		return
 	}
 	sid, err := redis.GetRedis().Get(state)
-	if err != nil || sid != "oauth_state" {
+	if err != nil || (sid != "oauth_state" && len(sid) != 36) {
 		middleware.Fail(c, serviceErr.OauthErr)
 		return
 	}
@@ -80,6 +95,43 @@ func HandleCallBack(c *gin.Context) {
 		middleware.Fail(c, serviceErr.InternalErr)
 		return
 	}
+
+	// 绑定流程
+	if sid != "oauth_state" {
+		userEntity := Mysql.User{}
+		userEntity.ID = sid
+		users.GetEntity(&userEntity)
+		found, entity := users.GetEntityByGithubId(githubInfo.Id)
+		if found {
+			if userEntity.ID == entity.ID {
+				middleware.FailWithCode(c, 40213, "已绑定成功，请勿重复绑定")
+				return
+			}
+			middleware.FailWithCode(c, 40212, "此 Github 已被使用，绑定用户："+entity.NickName)
+			return
+		}
+		err = users.AddGithubOauth(&Mysql.Oauth{
+			UserID:     sid,
+			OauthType:  "github",
+			OauthId:    strconv.Itoa(int(githubInfo.Id)),
+			UnionId:    githubInfo.NodeId,
+			Credential: token,
+		})
+		if err != nil {
+			logger.Error.Println(err)
+			middleware.Fail(c, serviceErr.InternalErr)
+			return
+		}
+		redirect, _ := redis.GetRedis().Get(state + "_redirect")
+		if redirect == "" {
+			redirect = config.GetConfig().FrontendLogin
+		}
+		c.Redirect(302, redirect)
+
+		return
+	}
+
+	// 登录流程
 	found, entity := users.GetEntityByGithubId(githubInfo.Id)
 	// 找到用户记录 直接登录
 	if found {
@@ -132,4 +184,27 @@ func HandleCallBack(c *gin.Context) {
 	}
 	c.Redirect(302, config.GetConfig().FrontendLogin+"/#/auth?token="+serviceToken)
 	users.SetLoginLog(entity.ID, token)
+}
+
+func HandleBindAccount(c *gin.Context) {
+	cuid, _ := c.Get("uid")
+	uid := cuid.(string)
+	redirect := c.Query("redirect")
+	if redirect == "" {
+		redirect = config.GetConfig().FrontendLogin
+	}
+	state := makeNewBindSession(redirect, uid)
+	query := url.Values{}
+	query.Add("response_type", "code")
+	query.Add("client_id", config.GetConfig().OAUTH.GITHUB.ClientId)
+	query.Add("redirect_uri", config.GetConfig().OAUTH.GITHUB.RedirectUri)
+	query.Add("state", state)
+	query.Add("scope", config.GetConfig().OAUTH.GITHUB.Scope)
+	redirectUrl := url.URL{
+		Scheme:   "https",
+		Host:     "github.com",
+		Path:     "/login/oauth/authorize",
+		RawQuery: query.Encode(),
+	}
+	c.Redirect(302, redirectUrl.String())
 }

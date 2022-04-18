@@ -55,3 +55,8 @@ type Oauth struct {
 	UnionId    string `gorm:"comment:QQ / 微信同一主体下 Unionid 相同"`
 	Credential string `gorm:"commrnt:密码凭证 /access_token (目前更多是存储在缓存里)"`
 }
+
+func (u *Oauth) BeforeCreate(tx *gorm.DB) (err error) {
+	u.ID = uuid.NewV4().String()
+	return
+}

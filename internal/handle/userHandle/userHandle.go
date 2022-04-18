@@ -205,6 +205,68 @@ func HandleResetPassword(c *gin.Context) {
 	middleware.Success(c, req.Phone)
 }
 
+func HandleSendChangePhoneCode(c *gin.Context) {
+	var req user.SendCode
+	if err := c.ShouldBindJSON(&req); err != nil {
+		middleware.Fail(c, serviceErr.RequestErr)
+		return
+	}
+	if !captcha.VerifyCaptcha(req.CaptchaId, req.CaptchaValue) {
+		middleware.FailWithCode(c, 40204, "验证码错误")
+		return
+	}
+
+	if users.CheckPhoneExist(req.Phone) {
+		middleware.FailWithCode(c, 40211, "手机号已被绑定")
+		return
+	}
+
+	_, err := redis.GetRedis().Get(req.Phone + "_rebind")
+	if err == nil {
+		middleware.FailWithCode(c, 40203, "发送过于频繁，稍后再试")
+		return
+	}
+	data := cmscode.GenValidateCode(6)
+	err = redis.GetRedis().Set(req.Phone+"_rebind", data, 5*time.Minute)
+	if err != nil {
+		middleware.Fail(c, serviceErr.InternalErr)
+		return
+	}
+	tecentCMS.SendCMS(req.Phone, []string{data})
+	middleware.Success(c, nil)
+}
+
+func HandleUpdatePhone(c *gin.Context) {
+	var req user.UpdatePhoneRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		middleware.Fail(c, serviceErr.RequestErr)
+		return
+	}
+
+	if users.CheckPhoneExist(req.Phone) {
+		middleware.FailWithCode(c, 40201, "手机号已存在")
+		return
+	}
+	cuid, _ := c.Get("uid")
+	uid := cuid.(string)
+
+	code, err := redis.GetRedis().Get(req.Phone + "_rebind")
+	if err != nil || code != req.Code {
+		middleware.Fail(c, serviceErr.CodeErr)
+		return
+	}
+
+	_ = redis.GetRedis().RemoveKey(req.Phone+"_rebind", false)
+
+	err = users.UpdatePhone(uid, req.Phone)
+	if err != nil {
+		logger.Error.Println(err)
+		middleware.Fail(c, serviceErr.InternalErr)
+		return
+	}
+	middleware.Success(c, nil)
+}
+
 func HandleUpdateNickName(c *gin.Context) {
 	var req user.UpdateNickNameRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
