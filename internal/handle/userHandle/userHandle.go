@@ -113,6 +113,11 @@ func HandleGeneralLogin(c *gin.Context) {
 		return
 	}
 
+	if len(req.Info) != 11 {
+		middleware.Fail(c, serviceErr.LoginErr)
+		return
+	}
+
 	entity := Mysql.User{Phone: req.Info}
 	users.GetEntity(&entity)
 

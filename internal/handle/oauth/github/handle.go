@@ -9,10 +9,14 @@ import (
 	"github.com/wujunyi792/crispy-waffle-be/internal/dto/user"
 	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
+	"github.com/wujunyi792/crispy-waffle-be/internal/model/Mysql"
 	"github.com/wujunyi792/crispy-waffle-be/internal/redis"
 	"github.com/wujunyi792/crispy-waffle-be/internal/service/github"
 	"github.com/wujunyi792/crispy-waffle-be/internal/service/jwtTokenGen"
+	"github.com/wujunyi792/crispy-waffle-be/pkg/utils/crypto"
+	"github.com/wujunyi792/crispy-waffle-be/pkg/utils/gen/xrandom"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -92,6 +96,25 @@ func HandleCallBack(c *gin.Context) {
 	// TODO 找不到记录，进入注册绑定流程（需要前端支持，暂不做）
 
 	// 自动注册没有绑定手机号的账号
+	salt := xrandom.GetRandom(6, xrandom.RAND_LOWER)
+	newUser := Mysql.User{
+		Base:      Mysql.Base{},
+		NickName:  githubInfo.Login,
+		Sex:       -1,
+		Phone:     xrandom.GetRandom(10, xrandom.RAND_NUM),
+		Signature: "这位用户没有任何想法~",
+		Password:  crypto.PasswordGen(xrandom.GetRandom(6, xrandom.RAND_LOWER), salt),
+		Salt:      salt,
+		Avatar:    githubInfo.AvatarUrl,
+		Oauth: []Mysql.Oauth{
+			{
+				OauthType:  "github",
+				OauthId:    strconv.Itoa(int(githubInfo.Id)),
+				UnionId:    "",
+				Credential: token,
+			},
+		},
+	}
 
 	middleware.Success(c, "用户不存在")
 }
