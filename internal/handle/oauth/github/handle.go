@@ -83,7 +83,7 @@ func HandleCallBack(c *gin.Context) {
 	found, entity := users.GetEntityByGithubId(githubInfo.Id)
 	// 找到用户记录 直接登录
 	if found {
-		serviceToken, err := jwtTokenGen.GenToken(jwtTokenGen.Info{UID: entity.ID})
+		serviceToken, err := jwtTokenGen.GenToken(jwtTokenGen.Info{UID: entity.ID, InfoComplete: true})
 		if err != nil {
 			middleware.Fail(c, serviceErr.InternalErr)
 			return
@@ -124,5 +124,11 @@ func HandleCallBack(c *gin.Context) {
 		return
 	}
 
-	middleware.Success(c, "用户不存在")
+	serviceToken, err := jwtTokenGen.GenToken(jwtTokenGen.Info{UID: entity.ID, InfoComplete: false})
+	if err != nil {
+		middleware.Fail(c, serviceErr.InternalErr)
+		return
+	}
+	middleware.Success(c, user.LoginResponse{Token: serviceToken})
+	users.SetLoginLog(entity.ID, token)
 }
