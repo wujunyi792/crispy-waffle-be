@@ -3,12 +3,16 @@ package jwtTokenGen
 import (
 	"errors"
 	"github.com/golang-jwt/jwt"
-	"github.com/wujunyi792/gin-template-new/config"
+	"github.com/wujunyi792/crispy-waffle-be/config"
 	"time"
 )
 
+type Info struct {
+	ID string
+}
+
 type JWTClaims struct {
-	Info interface{}
+	Info Info
 	jwt.StandardClaims
 }
 
@@ -17,7 +21,7 @@ const TokenExpireDuration = time.Hour * 12
 var MySecret = []byte(config.GetConfig().Auth.Secret)
 
 // GenToken 生成JWT
-func GenToken(info interface{}) (string, error) {
+func GenToken(info Info) (string, error) {
 	c := JWTClaims{
 		Info: info,
 		StandardClaims: jwt.StandardClaims{

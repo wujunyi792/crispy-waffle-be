@@ -2,7 +2,7 @@ package websocket
 
 import (
 	"fmt"
-	"github.com/wujunyi792/gin-template-new/internal/logger"
+	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"log"
 	"net/http"
 	"time"

@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/wujunyi792/gin-template-new/config"
-	"github.com/wujunyi792/gin-template-new/internal/logger"
+	"github.com/wujunyi792/crispy-waffle-be/config"
+	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 	"gorm.io/gorm"
 )
 

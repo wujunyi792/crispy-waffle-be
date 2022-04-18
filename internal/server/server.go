@@ -2,13 +2,12 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wujunyi792/gin-template-new/config"
-	_ "github.com/wujunyi792/gin-template-new/internal/controller/example"
-	_ "github.com/wujunyi792/gin-template-new/internal/corn"
-	"github.com/wujunyi792/gin-template-new/internal/logger"
-	"github.com/wujunyi792/gin-template-new/internal/middleware"
-	"github.com/wujunyi792/gin-template-new/internal/redis"
-	v1 "github.com/wujunyi792/gin-template-new/internal/router/v1"
+	"github.com/wujunyi792/crispy-waffle-be/config"
+	_ "github.com/wujunyi792/crispy-waffle-be/internal/corn"
+	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
+	"github.com/wujunyi792/crispy-waffle-be/internal/middleware"
+	"github.com/wujunyi792/crispy-waffle-be/internal/redis"
+	v1 "github.com/wujunyi792/crispy-waffle-be/internal/router/v1"
 )
 
 var E *gin.Engine

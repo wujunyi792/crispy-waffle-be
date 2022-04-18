@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"github.com/wujunyi792/gin-template-new/config"
+	"github.com/wujunyi792/crispy-waffle-be/config"
 	"io"
 	"log"
 	"os"

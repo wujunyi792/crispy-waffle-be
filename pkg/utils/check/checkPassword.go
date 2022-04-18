@@ -14,7 +14,7 @@ const (
 	LevelS
 )
 
-func Check(minLength, maxLength, minLevel int, pwd string) error {
+func PasswordStrengthCheck(minLength, maxLength, minLevel int, pwd string) error {
 	if len(pwd) < minLength {
 		return errors.New(fmt.Sprintf("BAD PASSWORD: The password is shorter than %d characters", minLength))
 	}

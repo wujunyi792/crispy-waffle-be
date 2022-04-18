@@ -2,7 +2,7 @@ package sonyflake
 
 import (
 	"github.com/sony/sonyflake"
-	"github.com/wujunyi792/gin-template-new/internal/logger"
+	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 )
 
 var flake *sonyflake.Sonyflake

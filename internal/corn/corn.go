@@ -2,7 +2,7 @@ package corn
 
 import (
 	"github.com/robfig/cron"
-	"github.com/wujunyi792/gin-template-new/internal/logger"
+	"github.com/wujunyi792/crispy-waffle-be/internal/logger"
 )
 
 func init() {
