@@ -145,8 +145,6 @@ func HandleCallBack(c *gin.Context) {
 		return
 	}
 
-	// TODO 找不到记录，进入注册绑定流程（需要前端支持，暂不做）
-
 	// 自动注册没有绑定手机号的账号
 	salt := xrandom.GetRandom(6, xrandom.RAND_LOWER)
 	newUser := Mysql.User{
